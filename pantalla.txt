@@ -1,0 +1,57 @@
+int Distancia = 0;
+int trigger = 4;
+int echo = 5;
+int led = 11;
+
+long calcularTiempo(int trigger_pin, int echo_pin);
+long calcularDistancia(int trigger_pin, int echo_pin);
+
+void setup(){
+    pinMode(echo, INPUT);
+    pinMode(trigger, OUTPUT);
+    pinMode(led, OUTPUT);
+    Serial.begin(9600);
+}
+
+void loop() {
+  Distancia = calcularDistancia(trigger, echo);
+  if(Distancia > 255) Distancia = 255;
+  if( Distancia < 0 ) Distancia = 0;
+
+  Serial.println(Distancia);
+  regularBrillo(Distancia);
+
+}
+
+
+long calcularTiempo(int trigger_pin, int echo_pin){
+    digitalWrite(trigger_pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigger_pin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigger_pin, LOW);
+    //retornamos el tiempo que tarda en recibir la señal desde que la envía
+    //el tiempo es en microsegundos
+  	long microseconds = pulseIn(echo_pin, HIGH);
+    return microseconds;
+}
+
+long calcularDistancia(int trigger_pin, int echo_pin){
+    long microseconds = calcularTiempo(trigger_pin, echo_pin);
+    long calcularDistancia;
+    calcularDistancia = microseconds/29/2;
+
+    if(calcularDistancia == 0){
+        calcularDistancia == 999;
+    }
+    return calcularDistancia;
+}
+
+void regularBrillo(long Distancia){
+    if(Distancia > 0){
+        analogWrite(led, Distancia);
+    }
+    else{
+        analogWrite(led, 0);
+    }
+}
